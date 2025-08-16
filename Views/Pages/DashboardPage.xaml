@@ -7,25 +7,31 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:vm="clr-namespace:POS_ModernUI.ViewModels.Pages"
-    xmlns:model="clr-namespace:POS_ModernUI.Models" xmlns:conv="clr-namespace:POS_ModernUI.Helpers"
+    xmlns:model="clr-namespace:POS_ModernUI.Models;assembly=POS_ModernUI.Models" xmlns:conv="clr-namespace:POS_ModernUI.Helpers"
     Title="DashboardPage"
     d:DataContext="{d:DesignInstance local:DashboardPage,
                                      IsDesignTimeCreatable=False}"
-    d:DesignHeight="450"
-    d:DesignWidth="800"
+    d:DesignHeight="650"
+    d:DesignWidth="900"
     ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"
     ui:Design.Foreground="{DynamicResource TextFillColorPrimaryBrush}"
     Foreground="{DynamicResource TextFillColorPrimaryBrush}"
     mc:Ignorable="d"
-    FlowDirection="RightToLeft" PreviewKeyDown="Page_PreviewKeyDown" PreviewTextInput="Page_PreviewTextInput">
+    FlowDirection="RightToLeft"
+    MouseDown="Page_PreviewMouseDown">
     
     <Page.Resources>
         <conv:DbImageToPhysicalPathConverter x:Key="ImagePathConverter" />
         <conv:DecimalToMoneyConverter x:Key="DecimalToMoneyConverter"/>
         <conv:FractionConverter x:Key="FractionConverter"/>
+        <conv:CusBooleanToVisibility x:Key="CusBooleanToVisibility"/>
     </Page.Resources>
 
-    <Grid VerticalAlignment="Top">
+    <Grid>
+        <ContentPresenter Name="ContentPresenter"
+                          Panel.ZIndex="10"/>
+        
+        <Grid VerticalAlignment="Top">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1.2*" />
             <ColumnDefinition Width="500" />
@@ -40,6 +46,7 @@
                 <ui:ToggleSwitch Grid.Row="0"
                                  Margin="10"
                                  Content="القطاعى"
+                                 Cursor="Hand"
                                  IsChecked="{Binding ViewModel.IsWithoutBarCode, Mode=TwoWay}"
                                  Command="{Binding ViewModel.ToggleCheckedCommand}"
                                  HorizontalAlignment="Left"
@@ -58,13 +65,7 @@
                 </Grid.ColumnDefinitions>
                 
                 
-                <!--<StackPanel Grid.Column="1" 
-                            FlowDirection="LeftToRight"
-                            HorizontalAlignment="Center">
-                    
-                </StackPanel>-->
                 
-                <!--#region ListOfItem -->
                 <ScrollViewer Grid.Row="1"
                               Grid.Column="3"
                               Height="{Binding ActualHeight, Converter={StaticResource FractionConverter}, ConverterParameter=0.9}"
@@ -125,7 +126,7 @@
                                                                                       VerticalAlignment="Bottom"
                                                                                       FontFamily="calibri"
                                                                                       Margin="0 0 0 0"
-                                                                                      Text="{Binding UnitPrice, Converter={StaticResource DecimalToMoneyConverter}}"
+                                                                                      Text="{Binding UnitShares[0].UnitPrice, Converter={StaticResource DecimalToMoneyConverter}}"
                                                                                       Grid.Row="1"/>
                                                                 </Grid>
                                                                 </Border>
@@ -152,169 +153,263 @@
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-            <WrapPanel Grid.Column="0" 
-                       Width="400"
-                       FlowDirection="RightToLeft">
+            <Grid Grid.Column="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="105"/>
+                </Grid.ColumnDefinitions>
+                <Grid Width="300"
+                      FlowDirection="RightToLeft">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Grid Margin="55 5" 
+                          Grid.Row="0"
+                          HorizontalAlignment="Center">
+                        <ui:Button Icon="{ui:SymbolIcon Symbol=ArrowClockwise16}"
+                                   Command="{Binding ViewModel.QuantityBackCommand}"
+                                   Click="Button_Click"
+                                   FontSize="20"
+                                   Appearance="Transparent"
+                                   BorderThickness="0"
+                                   Cursor="Hand"
+                                   Panel.ZIndex="10"/>
 
-                <ui:Button Width="80"
-                           Height="55"
-                           Command="{Binding ViewModel.ChangeQuantityCommand}"
-                           CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}"
-                           Click="Button_Click"
-                           Appearance="Dark">
-                    <ui:SymbolIcon Symbol="Eraser24"
-                                   FontWeight="Bold"
-                                   FontSize="20"/>
-                </ui:Button>
+                        <ui:TextBox Width="200"
+                                    Height="80"
+                                    FontSize="40"
+                                    ClearButtonEnabled="False"
+                                    TextAlignment="Center"
+                                    Text="{Binding ViewModel.Quantity}"
+                                    IsReadOnly="True"/>
+
+                        <ui:Button Icon="{ui:SymbolIcon Symbol=TextAsterisk16}"
+                                   Command="{Binding ViewModel.ClearQuantityCommand}"
+                                   CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}"
+                                   FontSize="20"
+                                   Background="Transparent"
+                                   Foreground="IndianRed"
+                                   Panel.ZIndex="10"
+                                   BorderThickness="0"
+                                   Cursor="Hand"
+                                   HorizontalAlignment="Right"/>
+                    </Grid>
+
+                    <Grid Grid.Row="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <StackPanel Orientation="Horizontal"
+                                    HorizontalAlignment="Center"
+                                    Grid.Row="0">
+                        
+                            <ui:Button Content="1"
+                                       Background="#FF0C60E6"
+                                       Opacity="0.7"
+                                       Cursor="Hand"
+                                       Foreground="White"
+                                       Width="78"
+                                       Height="45"
+                                       Command="{Binding ViewModel.ChangeQuantityCommand}"
+                                       CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}"
+                                       Click="Button_Click"/>
+                        
+                            <ui:Button Content="2"
+                                       Background="#FF0C60E6"
+                                       Cursor="Hand"
+                                       Opacity="0.7"
+                                       Foreground="White"
+                                       Width="78"
+                                       Height="45"
+                                       Command="{Binding ViewModel.ChangeQuantityCommand}"
+                                       CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}"
+                                       Click="Button_Click"/>
+                        
+                            <ui:Button Content="3"
+                                        Background="#FF0C60E6"
+                                        Opacity="0.7"
+                                       Cursor="Hand"
+                                        Foreground="White"
+                                        Width="78"
+                                        Height="45"
+                                        Command="{Binding ViewModel.ChangeQuantityCommand}"
+                                        CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}"
+                                        Click="Button_Click"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal"
+                                    HorizontalAlignment="Center"
+                                    Grid.Row="1">
+
+                            <ui:Button Content="4"
+                                       Background="#FF0C60E6"
+                                       Cursor="Hand"
+                                       Opacity="0.7"
+                                       Foreground="White"
+                                       Width="78"
+                                       Height="45"
+                                       Command="{Binding ViewModel.ChangeQuantityCommand}"
+                                       CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}"
+                                       Click="Button_Click"/>
+
+                            <ui:Button Content="5"
+                                       Background="#FF0C60E6"
+                                       Cursor="Hand"
+                                       Opacity="0.7"
+                                       Foreground="White"
+                                       Width="78"
+                                       Height="45"
+                                       Click="Button_Click"
+                                       Command="{Binding ViewModel.ChangeQuantityCommand}"
+                                       CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}"/>
+                        
+                            <ui:Button Content="6"
+                                        Click="Button_Click"
+                                        Background="#FF0C60E6"
+                                        Cursor="Hand"
+                                        Opacity="0.7"
+                                        Foreground="White"
+                                        Width="78"
+                                        Height="45"
+                                        Command="{Binding ViewModel.ChangeQuantityCommand}"
+                                        CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}"/>
+                        
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal"
+                                    HorizontalAlignment="Center"
+                                    Grid.Row="2">
+                            <ui:Button Content="7"
+                                        Click="Button_Click"
+                                        Background="#FF0C60E6"
+                                        Opacity="0.7"
+                                        Cursor="Hand"
+                                        Foreground="White"
+                                        Width="78"
+                                        Height="45"
+                                        Command="{Binding ViewModel.ChangeQuantityCommand}"
+                                        CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}"/>
+
+                            <ui:Button Content="8"
+                                        Click="Button_Click"
+                                        Background="#FF0C60E6"
+                                        Opacity="0.7"
+                                        Cursor="Hand"
+                                        Foreground="White"
+                                        Width="78"
+                                        Height="45"
+                                        Command="{Binding ViewModel.ChangeQuantityCommand}"
+                                        CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}"/>
+                        
+                            <ui:Button Content="9"
+                                       Click="Button_Click"
+                                       Background="#FF0C60E6"
+                                       Cursor="Hand"
+                                       Opacity="0.7"
+                                       Foreground="White"
+                                       Width="78"
+                                       Height="45"
+                                       Command="{Binding ViewModel.ChangeQuantityCommand}"
+                                       CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}"/>
+                        </StackPanel>
+
+
+                            <ui:Button Content="0"
+                                       Grid.Row="3"
+                                       Appearance="Dark"
+                                       Width="234"
+                                       Cursor="Hand"
+                                       HorizontalAlignment="Center"
+                                       Height="45"
+                                       Command="{Binding ViewModel.ChangeQuantityCommand}"
+                                       CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}"
+                                       Click="Button_Click"/>
+
+
+                    </Grid>
+                </Grid>
                 
-                <ui:TextBox Width="200"
-                            Height="80"
-                            Margin="5"
-                            FontSize="40"
-                            ClearButtonEnabled="False"
-                            TextAlignment="Center"
-                            Text="{Binding ViewModel.Quantity}"
-                            IsReadOnly="True"/>
+                <WrapPanel Grid.Column="1"
+                            Margin="0 10 0 0">
+                    <ui:Button Content="جنيه"
+                                Background="#FF0C60E6"
+                                Opacity="0.7"
+                               Cursor="Hand"
+                                Foreground="White"
+                                Width="100"
+                                Height="45"
+                                Command="{Binding ViewModel.SelectByPriceCommand}"
+                                CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}"
+                                Click="Button_Click"/>
 
-                <ui:Button Content="0"
-                           Width="80"
-                           Height="55"
-                           Command="{Binding ViewModel.ChangeQuantityCommand}"
-                           CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}"
-                           Click="Button_Click"
-                           Appearance="Dark"/>
-
-                <ui:Button Content="قطعة"
-                           Background="#FF0C60E6"
-                           Opacity="0.7"
-                           Foreground="White"
-                           Width="125"
-                           Height="55"
-                           IsEnabled="{Binding ViewModel.IsPieceEnabled}"
-                           Command="{Binding ViewModel.ChangeQuantityCommand}"
-                           CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}"
-                           Click="Button_Click"/>
-
-                <ui:Button Content="كيلو"
-                           Background="#FF0C60E6"
-                           Opacity="0.7"
-                           Foreground="White"
-                           Width="125"
-                           Height="55"
-                           IsEnabled="{Binding ViewModel.IsUnitsEnabled}"
-                           Command="{Binding ViewModel.ChangeQuantityCommand}"
-                           CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}"
-                           Click="Button_Click"/>
-
-                <ui:Button Content="جرام"
-                           Background="#FF0C60E6"
-                           Opacity="0.7"
-                           Foreground="White"
-                           Width="125"
-                           Height="55"
-                           IsEnabled="{Binding ViewModel.IsUnitsEnabled}"
-                           Command="{Binding ViewModel.ChangeQuantityCommand}"
-                           CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}"
-                           Click="Button_Click"/>
-
-                
-                <ui:Button Content="1"
-                           Background="#FF0C60E6"
-                           Opacity="0.7"
-                           Foreground="White"
-                           Width="75"
-                           Height="55"
-                           Command="{Binding ViewModel.ChangeQuantityCommand}"
-                           CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}"
-                           Click="Button_Click"/>
-                
-                <ui:Button Content="2"
-                           Background="#FF0C60E6"
-                           Opacity="0.7"
-                           Foreground="White"
-                           Width="75"
-                           Height="55"
-                           Command="{Binding ViewModel.ChangeQuantityCommand}"
-                           CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}"
-                           Click="Button_Click"/>
-
-                <ui:Button Content="3"
-                           Background="#FF0C60E6"
-                           Opacity="0.7"
-                           Foreground="White"
-                           Width="75"
-                           Height="55"
-                           Command="{Binding ViewModel.ChangeQuantityCommand}"
-                           CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}"
-                           Click="Button_Click"/>
-
-                <ui:Button Content="4"
-                           Background="#FF0C60E6"
-                           Opacity="0.7"
-                           Foreground="White"
-                           Width="75"
-                           Height="55"
-                           Command="{Binding ViewModel.ChangeQuantityCommand}"
-                           CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}"
-                           Click="Button_Click"/>   
-
-                <ui:Button Content="5"
-                           Background="#FF0C60E6"
-                           Opacity="0.7"
-                           Foreground="White"
-                           Width="75"
-                           Height="55"
-                           Click="Button_Click"
-                           Command="{Binding ViewModel.ChangeQuantityCommand}"
-                           CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}"/>
-
-                <StackPanel Orientation="Horizontal"
-                            HorizontalAlignment="Center"
-                            Margin="40 0">
+                    <ui:Button Content="قطعة"
+                                Background="#FF0C60E6"
+                                Opacity="0.7"
+                               Cursor="Hand"
+                                Foreground="White"
+                                Width="100"
+                                Height="45"
+                                Visibility="{Binding ViewModel.IsPieceEnabled, Converter={StaticResource CusBooleanToVisibility}}"
+                                Command="{Binding ViewModel.SelectByPriceCommand}"
+                                CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}"
+                                Click="Button_Click"/>
                     
-                    <ui:Button Content="6"
-                               Click="Button_Click"
-                               Background="#FF0C60E6"
-                               Opacity="0.7"
-                               Foreground="White"
-                               Width="75"
-                               Height="55"
-                               Command="{Binding ViewModel.ChangeQuantityCommand}"
-                               CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}"/>
+                    <ui:Button Content="علبة"
+                                Background="#FF0C60E6"
+                                Opacity="0.7"
+                                Foreground="White"
+                               Cursor="Hand"
+                                Width="100"
+                                Height="45"
+                                Visibility="{Binding ViewModel.IsBoxEnabled, Converter={StaticResource CusBooleanToVisibility}}"
+                                Command="{Binding ViewModel.SelectByBoxCommand}"
+                                CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}"
+                                Click="Button_Click"/>
+                    
+                    <ui:Button Content="كرتونة"
+                                Background="#FF0C60E6"
+                                Opacity="0.7"
+                                Foreground="White"
+                               Cursor="Hand"
+                                Width="100"
+                                Height="45"
+                                Visibility="{Binding ViewModel.IsCartonEnabled, Converter={StaticResource CusBooleanToVisibility}}"
+                                Command="{Binding ViewModel.SelectByCartonCommand}"
+                                CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}"
+                                Click="Button_Click"/>
 
-                    <ui:Button Content="7"
-                               Click="Button_Click"
-                               Background="#FF0C60E6"
-                               Opacity="0.7"
-                               Foreground="White"
-                               Width="75"
-                               Height="55"
-                               Command="{Binding ViewModel.ChangeQuantityCommand}"
-                               CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}"/>
+                    <ui:Button Content="كيلو"
+                                Background="#FF0C60E6"
+                                Opacity="0.7"
+                                Foreground="White"
+                                Width="100"
+                               Cursor="Hand"
+                                Height="45"
+                                Visibility="{Binding ViewModel.IsUnitsEnabled, Converter={StaticResource CusBooleanToVisibility}}"
+                                Command="{Binding ViewModel.SelectByKiloCommand}"
+                                CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}"
+                                Click="Button_Click"/>
 
-                    <ui:Button Content="8"
-                               Click="Button_Click"
-                               Background="#FF0C60E6"
-                               Opacity="0.7"
-                               Foreground="White"
-                               Width="75"
-                               Height="55"
-                               Command="{Binding ViewModel.ChangeQuantityCommand}"
-                               CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}"/>
-
-                    <ui:Button Content="9"
-                               Click="Button_Click"
-                               Background="#FF0C60E6"
-                               Opacity="0.7"
-                               Foreground="White"
-                               Width="75"
-                               Height="55"
-                               Command="{Binding ViewModel.ChangeQuantityCommand}"
-                               CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}"/>
-                </StackPanel>
-            </WrapPanel>
-
-            <!--DataGrid-->
+                    <ui:Button Content="جرام"
+                                Background="#FF0C60E6"
+                                Opacity="0.7"
+                               Cursor="Hand"
+                                Foreground="White"
+                                Width="100"
+                                Height="45"
+                                Visibility="{Binding ViewModel.IsUnitsEnabled, Converter={StaticResource CusBooleanToVisibility}}"
+                                Command="{Binding ViewModel.SelectByGramCommand}"
+                                CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}"
+                                Click="Button_Click"/>
+                </WrapPanel>
+            </Grid>
+            
+                    <!--DataGrid-->
             <DataGrid x:Name="Workersdata"
                       ItemsSource="{Binding ViewModel.ListOfSales, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                       FontFamily="Calibri"
@@ -448,9 +543,9 @@
                 </Grid.ColumnDefinitions>
                 <ui:TextBlock Grid.Column="0"
                               FontSize="20"
-                              FontFamily="Calibri"
                               Text="إجمالى المبلغ : " 
                               Appearance="Primary"
+                              FontFamily="Cairo"
                               HorizontalAlignment="Center"/>
 
                 <ui:TextBlock Text="{Binding ViewModel.TotalAmount, Mode=TwoWay, Converter={StaticResource DecimalToMoneyConverter}}"
@@ -459,7 +554,7 @@
                               FontSize="20"
                               Foreground="Green"
                               FontWeight="ExtraBold"
-                              FontFamily="Calibri"
+                              FontFamily="Cairo"
                               HorizontalAlignment="Center"/>    
             </Grid>
             
@@ -469,28 +564,35 @@
                 <ui:Button Content="تأكيد"
                            Background="#1F7D53"
                            Opacity="0.7"
+                           Cursor="Hand"
                            Foreground="White"
-                           Width="110"
+                           Width="150"
                            Height="45"
                            Click="Button_Click_1"/>
-                <ui:Button Content="الماسح الضوئى"
+                
+                <ui:Button Content="فاتورة دين"
                            Background="#0ABAB5"
                            Opacity="0.7"
+                           Cursor="Hand"
                            Foreground="White"
-                           Width="120"
                            Height="45"
-                           Click="Button_Click"
-                           x:Name="btnScan"/>
+                           Width="150"
+                           Click="Button_Click_2"/>
 
                 <ui:Button Content="الغاء"
+                           Cursor="Hand"
                            Background="#D84040"
                            Opacity="0.7"
                            Foreground="White"
-                           Width="110"
+                           Width="150"
                            Height="45"
                            Command="{Binding ViewModel.OrderCanceledCommand}"
                            Click="Button_Click"/>
             </StackPanel>
         </Grid>
+
+
+        
+    </Grid>
     </Grid>
 </Page>

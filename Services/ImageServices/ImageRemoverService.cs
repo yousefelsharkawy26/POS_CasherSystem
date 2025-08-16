@@ -1,5 +1,5 @@
 ﻿using System.IO;
-using POS_ModernUI.Database.Repository.IRepository;
+using POS_ModernUI.DataAccess.UnitOfWork;
 using POS_ModernUI.Services.ImageServices.Interface;
 
 namespace POS_ModernUI.Services.ImageServices;
@@ -11,23 +11,23 @@ public class ImageRemoverService : IImageRemoverService
         _unitOfWork = unitOfWork;
     }
 
-    public void AddPath(string path)
+    public async Task AddPath(string path)
     {
-        _unitOfWork.ImagePaths.Add(new() {  Path = path });
-        _unitOfWork.Save();
+        await _unitOfWork.ImagePaths.AddAsync(new() {  Path = path });
+        await _unitOfWork.SaveAsync();
     }
 
-    public void LazyRemoveImagesFromPaths()
+    public async Task LazyRemoveImagesFromPaths()
     {
-        var lst = _unitOfWork.ImagePaths.GetAll().ToList();
+        var lst = (await _unitOfWork.ImagePaths.GetAllAsync()).ToList();
         foreach (var path in lst)
         {
             try
             {
                 File.Delete(path.Path);
 
-                _unitOfWork.ImagePaths.Delete(path);
-                _unitOfWork.Save();
+                await _unitOfWork.ImagePaths.DeleteAsync(path);
+                await _unitOfWork.SaveAsync();
             }
             catch
             {

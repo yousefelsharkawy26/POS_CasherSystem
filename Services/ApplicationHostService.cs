@@ -1,6 +1,9 @@
-﻿using POS_ModernUI.Services.Contracts;
-using Microsoft.Extensions.Hosting;
+﻿using Wpf.Ui;
+using System.Diagnostics;
 using POS_ModernUI.Views.Windows;
+using Microsoft.Extensions.Hosting;
+using System.Runtime.InteropServices;
+using POS_ModernUI.Services.Contracts;
 
 namespace POS_ModernUI.Services
 {
@@ -10,8 +13,15 @@ namespace POS_ModernUI.Services
     public class ApplicationHostService : IHostedService
     {
         private readonly IServiceProvider _serviceProvider;
-
+        private Mutex _mutex;
         private ILoginNavigationWindow _navigationWindow;
+
+        [DllImport("user32.dll")]
+        private static extern bool SetForegroundWindow(IntPtr hWnd);
+
+        [DllImport("user32.dll")]
+        private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+        private const int SW_SHOWMAXIMIZED = 3;
 
         public ApplicationHostService(IServiceProvider serviceProvider)
         {
@@ -41,6 +51,33 @@ namespace POS_ModernUI.Services
         /// </summary>
         private async Task HandleActivationAsync()
         {
+            const string appName = "POS_ModernUI"; // اسم فريد للتطبيق
+            bool createdNew;
+
+            _mutex = new Mutex(true, appName, out createdNew);
+
+            if (!createdNew)
+            {
+                var current = Process.GetCurrentProcess();
+                var other = Process.GetProcessesByName(current.ProcessName)
+                                   .FirstOrDefault(p => p.Id != current.Id);
+
+                if (other != null)
+                {
+                    IntPtr hWnd = other.MainWindowHandle;
+                    if (hWnd != IntPtr.Zero)
+                    {
+                        ShowWindow(hWnd, SW_SHOWMAXIMIZED);   // أو SW_RESTORE
+                        SetForegroundWindow(hWnd);
+                    }
+                }
+
+                App.Current.Shutdown();
+                await Task.CompletedTask;
+                return;
+            }
+
+
             if (!Application.Current.Windows.OfType<LoginWindow>().Any())
             {
                 _navigationWindow = (
@@ -48,7 +85,6 @@ namespace POS_ModernUI.Services
                 )!;
 
                 _navigationWindow!.ShowWindow();
-
             }
 
             await Task.CompletedTask;

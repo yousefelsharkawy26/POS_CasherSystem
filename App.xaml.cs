@@ -1,10 +1,11 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using POS_ModernUI.Database.Context;
-using POS_ModernUI.Database.Repository;
-using POS_ModernUI.Database.Repository.IRepository;
-using POS_ModernUI.Models;
+using POS_ModernUI.DataAccess.Context;
+using POS_ModernUI.DataAccess.UnitOfWork;
+using POS_ModernUI.Extensions;
+using POS_ModernUI.Models.ViewModels;
 using POS_ModernUI.Services;
 using POS_ModernUI.Services.Contracts;
 using POS_ModernUI.Services.ImageServices;
@@ -15,7 +16,6 @@ using POS_ModernUI.Views.Pages;
 using POS_ModernUI.Views.Windows;
 using System.IO;
 using System.Windows.Threading;
-using WebSocketSharp.Server;
 using Wpf.Ui;
 using Wpf.Ui.DependencyInjection;
 
@@ -32,59 +32,29 @@ namespace POS_ModernUI
         // https://docs.microsoft.com/dotnet/core/extensions/configuration
         // https://docs.microsoft.com/dotnet/core/extensions/logging
 
-        // Add web socket server for barcode scanner
-        //private WebSocketServer WSSV;
-
         private static readonly IHost _host = Host
             .CreateDefaultBuilder()
-            .ConfigureAppConfiguration(c => { c.SetBasePath(Path.GetDirectoryName(AppContext.BaseDirectory)); })
+            .ConfigureAppConfiguration(c => 
+            {
+                c.AddJsonFile("appconfig.json", optional: false, reloadOnChange: true);
+                c.SetBasePath(Path.GetDirectoryName(AppContext.BaseDirectory)!); 
+            })
             .ConfigureServices((context, services) =>
             {
-                services.AddDbContext<AppDbContext>();
-                services.AddSingleton<IUnitOfWork, UnitOfWork>();
-                services.AddSingleton<INotificationService, NotificationService>();
-                services.AddSingleton<IImageRemoverService, ImageRemoverService>();
-                services.AddSingleton<ImageCompressor>();
-                services.AddSingleton<IPQRService>();
-
                 services.AddNavigationViewPageProvider();
 
                 services.AddHostedService<ApplicationHostService>();
 
-                // Theme manipulation
-                services.AddSingleton<IThemeService, ThemeService>();
-
-                // TaskBar manipulation
-                services.AddSingleton<ITaskBarService, TaskBarService>();
-
-                // Printer Service
-                services.AddSingleton<IPrinterService, PrinterService>();
-
-                // Service containing navigation, same as INavigationWindow... but without window
-                services.AddSingleton<INavigationService, NavigationService>();
-
                 // Main window with navigation
-                services.AddSingleton<ILoginNavigationWindow, LoginWindow>();
-                services.AddSingleton<LoginViewModel>();
-                services.AddSingleton<IMainNavigationWindow, MainWindow>();
-                services.AddSingleton<MainWindowViewModel>();
-                services.AddTransient<IProductNavigationWindow, AddEditProductWindow>();
-                services.AddTransient<AddEditProductViewModel>();
-                services.AddTransient<IPurchaseNavigationWindow, AddNewPurchaseWindow>();
-                services.AddTransient<AddNewPurchaseViewModel>();
+                services.AddApplicationCustomServices()
+                        .AddEFCoreConfiguration(context.Configuration)
+                        .AddWindows()
+                        .AddPages()
+                        .AddImageServices();
 
-                services.AddTransient<DashboardPage>();
-                services.AddTransient<DashboardViewModel>();
-                services.AddTransient<ProductManagementView>();
-                services.AddTransient<ProductManagementViewModel>();
-                services.AddTransient<PurchaseManagementView>();
-                services.AddTransient<PurchaseManagementViewModel>();
-                services.AddTransient<SalesManagementView>();
-                services.AddTransient<SalesManagementViewModel>();
-                services.AddSingleton<SettingsPage>();
-                services.AddSingleton<SettingsViewModel>();
+                
 
-                services.AddSingleton<CurrentUserModel>();
+
             }).Build();
 
         /// <summary>
@@ -100,13 +70,6 @@ namespace POS_ModernUI
         /// </summary>
         private async void OnStartup(object sender, StartupEventArgs e)
         {
-            //await Task.Run(() =>
-            //{
-            //    WSSV = new WebSocketServer("ws://0.0.0.0:5050");
-            //    WSSV.AddWebSocketService<BarcodeTCPSocket>("/barcode");
-            //    WSSV.Start();
-            //});
-
             await _host.StartAsync();
         }
 
@@ -115,11 +78,6 @@ namespace POS_ModernUI
         /// </summary>
         private async void OnExit(object sender, ExitEventArgs e)
         {
-            //await Task.Run(() =>
-            //{
-            //    WSSV.Stop();
-            //});
-
             await _host.StopAsync();
             _host.Dispose();
         }

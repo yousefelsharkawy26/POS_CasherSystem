@@ -18,106 +18,18 @@
     WindowStartupLocation="CenterScreen"
     WindowState="Maximized"
     mc:Ignorable="d"
-    FlowDirection="RightToLeft"
-    xmlns:conv="clr-namespace:POS_ModernUI.Helpers">
+    FlowDirection="RightToLeft">
 
-    <ui:FluentWindow.Resources>
-        <conv:CusBooleanToVisibility x:Key="CusBooleanToVisibility" />
-        <conv:DatetoTimeAgeConverter x:Key="DatetoTimeAgeConverter" />
-    </ui:FluentWindow.Resources>
     <Grid>
+        <ContentPresenter Name="ContentPresenter"
+                          Panel.ZIndex="100"/>
+        <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="361*" />
             <RowDefinition Height="6*"/>
         </Grid.RowDefinitions>
-
-        <ui:DropDownButton Grid.Row="1" 
-                           FlowDirection="LeftToRight"
-                           HorizontalAlignment="Right"
-                           CornerRadius="20"
-                           Appearance="Secondary"
-                           Margin="0 0 10 0"
-                           Icon="{ui:SymbolIcon Symbol=AlertBadge16}">
-            
-            <ui:DropDownButton.Flyout>
-                <ContextMenu>
-                    <StackPanel Width="300" FlowDirection="RightToLeft">
-                        <TextBlock Text="الاشعارات" 
-                                   FontWeight="Bold" 
-                                   Margin="10,5"/>
-                        <Separator/>
-
-                        <ItemsControl ItemsSource="{Binding ViewModel.Notifications.Notifications}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <ui:MenuItem Cursor="Hand"
-                                                 Command="{Binding Path=DataContext.ViewModel.NavegateNotificationsCommand, RelativeSource= {RelativeSource FindAncestor,AncestorType={x:Type ItemsControl}}}"
-                                                 CommandParameter="{Binding}">
-                                        <ui:MenuItem.Icon>
-                                            <ui:ImageIcon Source="/Images/white_shadow.png"
-                                                          Width="13"
-                                                          Height="12"
-                                                          Visibility="{Binding IsRead, Converter={StaticResource CusBooleanToVisibility}}"/>
-                                        </ui:MenuItem.Icon>
-                                        <ui:MenuItem.Header>
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*" />
-                                                    <ColumnDefinition Width="Auto" />
-                                                </Grid.ColumnDefinitions>
-
-                                                <StackPanel>
-                                                    <StackPanel Orientation="Horizontal">
-                                                        <ui:TextBlock Text="{Binding Title}"
-                                                                      FontWeight="Bold"
-                                                                      Margin="4,0,0,0"
-                                                                      FontSize="14"
-                                                                      Appearance="Secondary"/>
-                                                        <ui:TextBlock Text="{Binding Timestamp, Converter={StaticResource DatetoTimeAgeConverter}}"
-                                                                      Appearance="Secondary"
-                                                                      Margin="20,0,0,0"
-                                                                      Opacity="0.8"
-                                                                      FontSize="12"/>
-                                                    </StackPanel>
-                                                    
-                                                    <ui:TextBlock Text="{Binding Message}"
-                                                                  Margin="4,0,0,0"
-                                                                  FontSize="12"
-                                                                  TextTrimming="CharacterEllipsis"
-                                                                  MaxWidth="200"
-                                                                  Appearance="Secondary"/>
-                                                </StackPanel>
-
-                                                <Button Margin="4"
-                                                        Grid.Column="1"
-                                                        Padding="7,5"
-                                                        CommandParameter="{Binding}"
-                                                        Command="{Binding Path=DataContext.ViewModel.RemoveNotificationCommand, RelativeSource= {RelativeSource FindAncestor,AncestorType={x:Type ui:FluentWindow}}}">
-                                                    <ui:SymbolIcon Symbol="Delete16" />
-                                                    <Button.ToolTip>
-                                                        <TextBlock Text="حذف"
-                                                                   FontSize="14" />
-                                                    </Button.ToolTip>
-                                                </Button>
-                                            </Grid>
-                                        </ui:MenuItem.Header>
-                                    </ui:MenuItem>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-
-                        <Separator/>
-                        <ui:HyperlinkButton Content="الكل"
-                                            HorizontalAlignment="Center"
-                                            Appearance="Secondary"
-                                            Margin="0,5"
-                                            Cursor="Hand"/>
-                    </StackPanel>
-                </ContextMenu>
-            </ui:DropDownButton.Flyout>
-        </ui:DropDownButton>
 
         <ui:NavigationView
             x:Name="RootNavigation"
@@ -132,7 +44,9 @@
             PaneDisplayMode="LeftMinimal"
             IsPaneOpen="False" Grid.RowSpan="2">
             <ui:NavigationView.Header>
-                <ui:BreadcrumbBar x:Name="BreadcrumbBar" Margin="42,32,42,20" />
+                <ui:BreadcrumbBar x:Name="BreadcrumbBar" 
+                                  Margin="42,32,42,20"
+                                  FontFamily="Cairo"/>
             </ui:NavigationView.Header>
             <ui:NavigationView.ContentOverlay>
                 <Grid>
@@ -155,10 +69,13 @@
         <ui:TitleBar
             x:Name="TitleBar"
             Title="{Binding ViewModel.ApplicationTitle}"
-            CloseWindowByDoubleClickOnIcon="True" VerticalAlignment="Center">
+            CloseWindowByDoubleClickOnIcon="True" 
+            VerticalAlignment="Center"
+            FontFamily="Cairo">
             <ui:TitleBar.Icon>
                 <ui:ImageIcon Source="pack://application:,,,/Assets/wpfui-icon-256.png" />
             </ui:TitleBar.Icon>
         </ui:TitleBar>
+    </Grid>
     </Grid>
 </ui:FluentWindow>

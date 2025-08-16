@@ -1,36 +1,39 @@
-﻿using POS_ModernUI.Database.Repository.IRepository;
-using POS_ModernUI.Models;
-using System.Security;
-using System.Windows.Controls;
+﻿using POS_ModernUI.DataAccess.UnitOfWork;
+using POS_ModernUI.Models.ViewModels;
+using Wpf.Ui.Appearance;
 
 namespace POS_ModernUI.ViewModels.Windows;
 public partial class LoginViewModel: ObservableObject
 {
+    #region Fields
     private readonly IUnitOfWork _unitOfWork;
     private CurrentUserModel _currentUserModel;
+    #endregion
 
-    [ObservableProperty]
-    private string _errorMessage;
+    #region Props
+    [ObservableProperty] private string _errorMessage = string.Empty;
+    [ObservableProperty] private string _name = string.Empty;
+    [ObservableProperty] private string _password = string.Empty;
+    [ObservableProperty] private string _applicationTitle = "POS_ModernUI";
+    [ObservableProperty] private ApplicationTheme _currentTheme = ApplicationTheme.Unknown;
+    [ObservableProperty] private bool _isDarkTheme = false;
+    #endregion
 
-    [ObservableProperty]
-    private string _name;
-
-    [ObservableProperty]
-    private string _password;
-
-    [ObservableProperty]
-    private string _applicationTitle = "POS_ModernUI";
-
-    public LoginViewModel(IUnitOfWork unitOfWork, CurrentUserModel currentUserModel)
+    #region Constructors
+    public LoginViewModel(IUnitOfWork unitOfWork, 
+                          CurrentUserModel currentUserModel)
     {
         _unitOfWork = unitOfWork;
         _currentUserModel = currentUserModel;
     }
+    #endregion
 
+    #region Commands
     [RelayCommand]
-    private void OnLoginProcess()
+    private async Task OnLoginProcess()
     {
-        var user = _unitOfWork.Users.Get(u => u.Password == Password);
+        CanLogin = false;
+        var user = await _unitOfWork.Users.GetAsync(u => u.Password == Password);
 
         if (user == null)
         {
@@ -42,7 +45,21 @@ public partial class LoginViewModel: ObservableObject
         _currentUserModel.Name = user.Name;
         _currentUserModel.Password = user.Password;
         _currentUserModel.Id = user.Id;
+        _currentUserModel.RoleLevel = user.RoleLevel;
 
         Name = user.Name;
+        CanLogin = true;
     }
+
+    [RelayCommand]
+    private void OnChangeTheme(string parameter)
+    {
+
+        CurrentTheme = IsDarkTheme ? ApplicationTheme.Dark : ApplicationTheme.Light;
+        ApplicationThemeManager.Apply(CurrentTheme);
+    }
+
+    [ObservableProperty, NotifyCanExecuteChangedFor(nameof(LoginProcessCommand))]
+    private bool _canLogin = true;
+    #endregion
 }

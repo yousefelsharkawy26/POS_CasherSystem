@@ -1,9 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36221.1 d17.14
+VisualStudioVersion = 17.14.36221.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "POS_ModernUI", "POS_ModernUI.csproj", "{AB2D85F3-BE15-4372-827E-0AB6BE470A48}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "POS_ModernUI.DataAccess", "..\POS_ModernUI.DataAccess\POS_ModernUI.DataAccess.csproj", "{BEE6DEB7-DE9A-4A81-AF56-1AAA27695C5C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "POS_ModernUI.Models", "..\POS_ModernUI.Models\POS_ModernUI.Models.csproj", "{539B5FE6-E0C0-450B-8C44-684F89015697}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{AB2D85F3-BE15-4372-827E-0AB6BE470A48}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AB2D85F3-BE15-4372-827E-0AB6BE470A48}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AB2D85F3-BE15-4372-827E-0AB6BE470A48}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BEE6DEB7-DE9A-4A81-AF56-1AAA27695C5C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BEE6DEB7-DE9A-4A81-AF56-1AAA27695C5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BEE6DEB7-DE9A-4A81-AF56-1AAA27695C5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BEE6DEB7-DE9A-4A81-AF56-1AAA27695C5C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{539B5FE6-E0C0-450B-8C44-684F89015697}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{539B5FE6-E0C0-450B-8C44-684F89015697}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{539B5FE6-E0C0-450B-8C44-684F89015697}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{539B5FE6-E0C0-450B-8C44-684F89015697}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

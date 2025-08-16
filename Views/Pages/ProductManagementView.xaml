@@ -4,14 +4,14 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:local="clr-namespace:POS_ModernUI.Views.Pages"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-      xmlns:models="clr-namespace:POS_ModernUI.Models"
+      xmlns:models="clr-namespace:POS_ModernUI.Models;assembly=POS_ModernUI.Models"
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
       xmlns:conv="clr-namespace:POS_ModernUI.Helpers"
       Title="Product Management"
       d:DataContext="{d:DesignInstance local:ProductManagementView,
                                        IsDesignTimeCreatable=False}"
-      d:DesignHeight="450"
-      d:DesignWidth="800"
+      d:DesignHeight="650"
+      d:DesignWidth="1400"
       ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"
       ui:Design.Foreground="{DynamicResource TextFillColorPrimaryBrush}"
       Foreground="{DynamicResource TextFillColorPrimaryBrush}"
@@ -21,6 +21,8 @@
 
     <Page.Resources>
         <conv:DbImageToPhysicalPathConverter x:Key="PhysicalSourceImageConverter"/>
+        <conv:DecimalToMoneyConverter x:Key="DecimalToMoneyConverter" />
+        <conv:ProductToQuantityWithUnitConverter x:Key="ProductToQuantityWithUnitConverter" />
     </Page.Resources>
     
     <Grid>
@@ -39,16 +41,18 @@
             <StackPanel Orientation="Horizontal"
                     HorizontalAlignment="Center">
                 <ui:CardAction Padding="0"
-                               Width="200"
+                               Width="280"
                                VerticalAlignment="Stretch"
                                CommandParameter="BasicInput"
                                IsChevronVisible="False"
+                               Margin="20,5"
                                Background="#B22222"
-                               Height="70"
+                               Height="80"
                                Opacity="0.8">
-                    <StackPanel Height="60"
-                                Width="180">
+                    <StackPanel Height="75"
+                                Width="270">
                         <ui:TextBlock Text="منتجات منتهية"
+                                      FontFamily="Cairo"
                                       Appearance="Primary"
                                       FontSize="16"
                                       FontWeight="ExtraBlack"
@@ -64,18 +68,19 @@
                 </ui:CardAction>
                 
                 <ui:CardAction Padding="0"
-                               Width="200"
+                               Width="280"
                                VerticalAlignment="Stretch"
-                               Margin="40,5"
+                               Margin="20,5"
                                CommandParameter="BasicInput"
                                IsChevronVisible="False"
                                Background="#FFC107"
-                               Height="70"
+                               Height="80"
                                Opacity="0.8">
-                    <StackPanel Height="60"
-                                Width="180">
+                    <StackPanel Height="75"
+                                Width="270">
                         <ui:TextBlock Text="منتجات على وشك الانتهاء"
                                       Appearance="Primary"
+                                      FontFamily="Cairo"
                                       FontSize="16"
                                       FontWeight="ExtraBlack"
                                       Foreground="White"/>
@@ -90,22 +95,51 @@
                 </ui:CardAction>
                 
                 <ui:CardAction Padding="0"
-                               Width="200"
+                               Width="280"
                                VerticalAlignment="Stretch"
                                CommandParameter="BasicInput"
                                IsChevronVisible="False"
+                               Margin="20,5"
                                Background="#347433"
-                               Height="70"
+                               Height="80"
                                Opacity="0.8">
-                    <StackPanel Height="60"
-                                Width="180">
+                    <StackPanel Height="75"
+                                Width="270">
                         <ui:TextBlock Text="إجمالى المنتجات"
                                       Appearance="Primary"
+                                      FontFamily="Cairo"
                                       FontSize="16"
                                       FontWeight="ExtraBlack"
                                       Foreground="White"/>
 
                         <ui:TextBlock Text="{Binding ViewModel.TotalProductsCount}"
+                                      FontSize="30"
+                                      FontWeight="ExtraBlack"
+                                      Foreground="Wheat"
+                                      Opacity="0.9"
+                                      HorizontalAlignment="Center"/>
+                    </StackPanel>
+                </ui:CardAction>
+                
+                <ui:CardAction Padding="0"
+                               Width="280"
+                               VerticalAlignment="Stretch"
+                               CommandParameter="BasicInput"
+                               Margin="20,5"
+                               IsChevronVisible="False"
+                               Background="#347433"
+                               Height="80"
+                               Opacity="0.8">
+                    <StackPanel Height="75"
+                                Width="260">
+                        <ui:TextBlock Text="إجمالى سعر المنتجات"
+                                      Appearance="Primary"
+                                      FontFamily="Cairo"
+                                      FontSize="16"
+                                      FontWeight="ExtraBlack"
+                                      Foreground="White"/>
+
+                        <ui:TextBlock Text="{Binding ViewModel.TotalPrice, Mode=TwoWay, Converter={StaticResource DecimalToMoneyConverter}}"
                                       FontSize="30"
                                       FontWeight="ExtraBlack"
                                       Foreground="Wheat"
@@ -148,42 +182,24 @@
         </Grid>
         
         <DataGrid x:Name="Workersdata"
-          ItemsSource="{Binding ViewModel.ListOfProducts, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-          FontFamily="Calibri"
-          VirtualizingPanel.IsVirtualizing="True"
-          VirtualizingPanel.VirtualizationMode="Recycling"
-          Grid.Row="2"
-          FontSize="15"
-          Margin="10 0 0 0"
-          Padding="7"
-          CanUserReorderColumns="False"
-          CanUserResizeColumns="False"
-          AutoGenerateColumns="False"
-          CanUserResizeRows="False"
-          VerticalScrollBarVisibility="Auto"
-          CanUserAddRows="False">
+                  ItemsSource="{Binding ViewModel.ListOfProducts, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                  VirtualizingPanel.IsVirtualizing="True"
+                  VirtualizingPanel.VirtualizationMode="Recycling"
+                  Grid.Row="2"
+                  FontSize="15"
+                  Margin="10 0 0 0"
+                  Padding="7"
+                  CanUserReorderColumns="False"
+                  CanUserResizeColumns="False"
+                  AutoGenerateColumns="False"
+                  CanUserResizeRows="False"
+                  VerticalScrollBarVisibility="Auto"
+                  CanUserAddRows="False"
+                  IsReadOnly="True">
             <DataGrid.Columns>
-
-                <DataGridTextColumn Header="رقم الباركود"
-                                    Binding="{Binding Barcode}"
-                                    ElementStyle="{StaticResource CenterDtaGridCell}"
-                                    HeaderStyle="{DynamicResource CenterGridHeaderStyle}"
-                                    IsReadOnly="True"
-                                    Width="*">
-                    <DataGridTextColumn.CellStyle>
-                        <Style TargetType="DataGridCell">
-                            <Setter Property="ToolTip">
-                                <Setter.Value>
-                                    <TextBlock FontSize='17' />
-                                </Setter.Value>
-                            </Setter>
-                        </Style>
-                    </DataGridTextColumn.CellStyle>
-                </DataGridTextColumn>
                 <DataGridTextColumn Header="إسم المنتج"
                             Binding="{Binding Name}"
                             HeaderStyle="{DynamicResource CenterGridHeaderStyle}"
-                            IsReadOnly="True"
                             ElementStyle="{StaticResource CenterDtaGridCell}"
                             Width="*">
                     <DataGridTextColumn.CellStyle>
@@ -198,10 +214,9 @@
                 </DataGridTextColumn>
 
                 <DataGridTextColumn Header="السعر"
-                            Binding="{Binding UnitPrice, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            Binding="{Binding UnitShares[0].UnitPrice, Mode=TwoWay, Converter={StaticResource DecimalToMoneyConverter}}"
                             ElementStyle="{StaticResource CenterDtaGridCell}"
                             HeaderStyle="{DynamicResource CenterGridHeaderStyle}"
-                            IsReadOnly="False"
                             Width=".75*">
                     <DataGridTextColumn.CellStyle>
                         <Style TargetType="DataGridCell">
@@ -215,10 +230,8 @@
                 </DataGridTextColumn>
 
                 <DataGridTextColumn Header="مخزون"
-                            Binding="{Binding QuantityInStock}"
                             ElementStyle="{StaticResource CenterDtaGridCell}"
                             HeaderStyle="{DynamicResource CenterGridHeaderStyle}"
-                            IsReadOnly="True"
                             Width="*">
                     <DataGridTextColumn.CellStyle>
                         <Style TargetType="DataGridCell">
@@ -229,12 +242,14 @@
                             </Setter>
                         </Style>
                     </DataGridTextColumn.CellStyle>
+                    <DataGridTextColumn.Binding>
+                        <Binding Converter="{StaticResource ProductToQuantityWithUnitConverter}"/>
+                    </DataGridTextColumn.Binding>
                 </DataGridTextColumn>
 
                 <DataGridTemplateColumn Header="الصورة"
                                         Width="0.7*"
-                                        HeaderStyle="{StaticResource CenterGridHeaderStyle}"
-                                        IsReadOnly="True">
+                                        HeaderStyle="{StaticResource CenterGridHeaderStyle}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <ui:Image Source="{Binding Image, Converter={StaticResource PhysicalSourceImageConverter}}"

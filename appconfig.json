@@ -1,0 +1,5 @@
+{
+  "ConnectionStrings": {
+    "DevConn": "Server=.;Database=POSZiKo_Db;Trusted_Connection=True;TrustServerCertificate=True;MultipleActiveResultSets=True"
+  }
+}

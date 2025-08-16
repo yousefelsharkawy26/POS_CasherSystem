@@ -8,9 +8,9 @@ public class CusBooleanToVisibility : IValueConverter
     {
         if (value is bool booleanValue)
         {
-            return !booleanValue ? System.Windows.Visibility.Visible : System.Windows.Visibility.Hidden;
+            return booleanValue ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;
         }
-        return System.Windows.Visibility.Hidden;
+        return System.Windows.Visibility.Collapsed;
     }
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
     {

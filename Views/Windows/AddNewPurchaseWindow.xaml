@@ -129,12 +129,12 @@
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
                             <DataGridTemplateColumn Header="إسم المنتج"
-                                                HeaderStyle="{DynamicResource CenterGridHeaderStyle}"
-                                                Width="*">
+                                                    HeaderStyle="{DynamicResource CenterGridHeaderStyle}"
+                                                    Width="*">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <ui:TextBox Text="{Binding ProductName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                            />
+                                                    IsReadOnly="{Binding IsReadOnly}"/>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
@@ -149,25 +149,26 @@
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
                             <DataGridTemplateColumn Header="السعر الواحدة"
-                                                HeaderStyle="{DynamicResource CenterGridHeaderStyle}"
-                                                Width="*">
+                                                    HeaderStyle="{DynamicResource CenterGridHeaderStyle}"
+                                                    Width="*">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <ui:TextBox Text="{Binding UnitCost, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                    IsReadOnly="{Binding IsReadOnly}"
                                                     />
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
                             <DataGridTemplateColumn Header="الوحدة"
                                                     HeaderStyle="{DynamicResource CenterGridHeaderStyle}"
-                                                    IsReadOnly="True"
                                                     Width="*">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <ComboBox ItemsSource="{Binding Units}"
-                                                  SelectedItem="{Binding SelectedUnit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                  SelectedValue="قطعة"
-                                                  IsReadOnly="{Binding IsReadOnly}"/>
+                                                  SelectedItem="{Binding SelectedUnit, Mode=TwoWay}"
+                                                  IsReadOnly="{Binding IsReadOnly}"
+                                                  IsEditable="False"
+                                                  DisplayMemberPath="Name"/>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>

@@ -22,8 +22,13 @@
 
     <ui:FluentWindow.Resources>
         <conv:DbImageToPhysicalPathConverter x:Key="ProductImageConverter"/>
+        <conv:FractionConverter x:Key="FractionConverter"/>
+        <conv:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
+        <conv:CusBooleanToVisibility x:Key="CusBooleanToVisibility"/>
     </ui:FluentWindow.Resources>
+    
     <Grid>
+
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="361*" />
@@ -48,13 +53,19 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="auto"/>
             </Grid.ColumnDefinitions>
+            <ui:ProgressRing IsIndeterminate="True"
+                             Visibility="{Binding ViewModel.IsBusy, Converter={StaticResource CusBooleanToVisibility}}"
+                             Width="50" 
+                             Height="50" 
+                             Panel.ZIndex="10"
+                             HorizontalAlignment="Center"/>
             <StackPanel Grid.Column="0">
                 <ui:TextBlock x:Name="txtTitle"
                               Text="إضافة منتج جديد"
                               FontSize="24"
                               FontWeight="ExtraBold"
                               Margin="50, 30"
-                              Appearance="Secondary"/>
+                              Appearance="Primary"/>
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="130"/>
@@ -72,83 +83,132 @@
                 </Grid>
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="130"/>
+                        <ColumnDefinition Width="auto"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <ui:TextBlock Text="الكمية :"
-                                  Appearance="Secondary"
-                                  Grid.Column="0"
-                                  Margin="50, 20, 0, 10"/>
-                    <ui:TextBox PlaceholderText="أدخل الكمية ......"
-                                x:Name="txtQuantity"
-                                Text="{Binding ViewModel.ProductQuantity}"
-                                Grid.Column="1"
-                                Margin="30, 10, 50, 10"/>
-                </Grid>
-                
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="130"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <ui:TextBlock Text="وحدة القياس :"
-                                  Appearance="Secondary"
-                                  Grid.Column="0"
-                                  Margin="50, 20, 0, 10"/>
-                    <ComboBox Grid.Column="1"
-                              x:Name="cbUnits"
-                              ItemsSource="{Binding ViewModel.Units}"
-                              DisplayMemberPath="Name" 
-                              SelectedValuePath="Name"
+                    <ui:Button Appearance="Secondary"
+                               Content="{Binding ViewModel.QuantityUnitType}"
+                               Margin="50, 20, 0, 10"
+                               Icon="{ui:SymbolIcon Symbol=Add48}"
+                               Command="{Binding ViewModel.AddProductUnitItemCommand}"/>
+
+                    <DataGrid ItemsSource="{Binding ViewModel.NewProductUnits, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                              MaxHeight="{Binding ActualHeight, Converter={StaticResource FractionConverter}, ConverterParameter=0.45}"
+                              SelectedItem="{Binding ViewModel.SelectedProductUnit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                              VerticalScrollBarVisibility="Auto"
+                              CanUserReorderColumns="False"
+                              CanUserResizeColumns="False"
+                              AutoGenerateColumns="False"
+                              CanUserResizeRows="False"
+                              CanUserAddRows="False"
+                              SelectionMode="Single"
+                              FontFamily="Calibri"
                               Margin="30, 10, 50, 10"
-                              SelectedValue="قطعة"
-                              SelectedItem="{Binding ViewModel.SelectedUnit}" />
-
-
+                              Grid.Column="1"
+                              FontSize="15"
+                              Padding="7">
+                        <DataGrid.Columns>
+                            <DataGridTemplateColumn Header="كود المنتج"
+                                    HeaderStyle="{DynamicResource CenterGridHeaderStyle}"
+                                    IsReadOnly="False"
+                                    Width="*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <ui:TextBox Text="{Binding ProductCode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                    KeyDown="TextBox_KeyDown"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="الكمية"
+                                    HeaderStyle="{DynamicResource CenterGridHeaderStyle}"
+                                    Width="*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <ui:TextBox Text="{Binding Quantity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                    />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="عدد الوحدات في الوحدة الأكبر"
+                                                    HeaderStyle="{DynamicResource CenterGridHeaderStyle}"
+                                                    Width="*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <ui:TextBox Text="{Binding QuantityPerParent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                    IsReadOnly="{Binding IsFirstRow}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="السعر الواحدة"
+                                HeaderStyle="{DynamicResource CenterGridHeaderStyle}"
+                                Width="*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <ui:TextBox Text="{Binding UnitCost, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="الوحدة"
+                                                    HeaderStyle="{DynamicResource CenterGridHeaderStyle}"
+                                                    Width="*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <ComboBox ItemsSource="{Binding Units}"
+                                                  DisplayMemberPath="Name" 
+                                                  SelectedItem="{Binding SelectedUnit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="عملیات"
+                                    Width="85"
+                                    HeaderStyle="{DynamicResource CenterGridHeaderStyle}">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal"
+                                    HorizontalAlignment="Center">
+                                            <Button Margin="4"
+                                    Padding="7,5"
+                                    CommandParameter="{Binding}"
+                                    Command="{Binding Path=DataContext.ViewModel.DeleteProductUnitItemCommand, RelativeSource= {RelativeSource FindAncestor,AncestorType={x:Type DataGrid}}}">
+                                                <ui:SymbolIcon Symbol="Delete16" />
+                                                <Button.ToolTip>
+                                                    <TextBlock Text="حذف"
+                                               FontSize="14" />
+                                                </Button.ToolTip>
+                                            </Button>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
                 </Grid>
 
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="130"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <ui:TextBlock Text="السعر :"
-                                  x:Name="txtUnitPrice"
-                                  Appearance="Secondary"
-                                  Grid.Column="0"
-                                  Margin="50, 20, 0, 10"/>
-                    <ui:TextBox PlaceholderText="سعر القطعة الواحدة......"
-                                Text="{Binding ViewModel.ProductUnitPrice}"
-                                Grid.Column="1"
-                                Margin="30, 10, 50, 10"/>
-                </Grid>
+                <ui:TextBlock Text="{Binding ViewModel.ErrorMessage}" 
+                              HorizontalAlignment="Center"
+                              Background="#FFFF4A4A" 
+                              Foreground="#E4E9E5E5"
+                              FontFamily="Cairo"
+                              FontWeight="SemiBold"
+                              TextDecorations="Underline"/>
 
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="130"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <ui:TextBlock Text="كود المنتج :"
-                                  Appearance="Secondary"
-                                  Grid.Column="0"
-                                  Margin="50, 20, 0, 10"/>
-                    
-                    <ui:TextBox PlaceholderText="الكود"
-                                x:Name="txtBarcode"
-                                Text="{Binding ViewModel.ProductBarCode}"
-                                Margin="30, 10, 50, 10"
-                                Grid.Column="1"/>
-                </Grid>
-
-
-                <ui:Button Content="حفظ المنتج"
-                           HorizontalAlignment="Center"
-                           Width="200"
-                           FontWeight="ExtraBold"
-                           Appearance="Primary"
-                           Margin="0,40"
-                           Cursor="Hand"
-                           Click="SaveProductButton_Click"/>
+                <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Center"
+                            Margin="0 20">
+                    <ui:Button Content="حفظ المنتج"
+                               Width="200"
+                               FontWeight="ExtraBold"
+                               Cursor="Hand"
+                               Appearance="Primary"
+                               IsEnabled="{Binding ViewModel.IsBusy, Converter={StaticResource InverseBooleanConverter}}"
+                               Click="SaveProductButton_Click"/>
+                    <ui:Button Content="إلغاء" 
+                               Command="{Binding ViewModel.ResetFieldsCommand}"
+                               Width="100"
+                               FontWeight="ExtraBold"
+                               Cursor="Hand"
+                               Appearance="Danger"/>
+                </StackPanel>
             </StackPanel>
 
             <StackPanel FlowDirection="LeftToRight"

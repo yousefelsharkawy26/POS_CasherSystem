@@ -37,9 +37,9 @@ public class PrinterService : IPrinterService
         PrintDocument(preview);
 
         doc.Close();
-        writer = null;
-        output_Doc = null;
-        doc = null;
+        writer = null!;
+        output_Doc = null!;
+        doc = null!;
     }
 
 
@@ -50,7 +50,7 @@ public class PrinterService : IPrinterService
         printDialog.PrintTicket = printDialog.PrintQueue.DefaultPrintTicket;
 
         printDialog.PrintTicket.PageOrientation = PageOrientation.Portrait;
-        printDialog.PrintTicket.PageMediaSize = new PageMediaSize(80, 20);
+        printDialog.PrintTicket.PageMediaSize = new PageMediaSize(85, 20);
         printDialog.PrintTicket.PageBorderless = PageBorderless.None;
 
         document.PrintTicket = printDialog.PrintTicket;

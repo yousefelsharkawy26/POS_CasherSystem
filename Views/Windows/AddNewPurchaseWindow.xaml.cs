@@ -1,20 +1,24 @@
-﻿using Wpf.Ui.Controls;
-using Wpf.Ui.Appearance;
-using Wpf.Ui.Abstractions;
+﻿using Microsoft.IdentityModel.Tokens;
+using POS_ModernUI.Helpers;
 using POS_ModernUI.Services.Contracts;
 using POS_ModernUI.ViewModels.Windows;
 using System.Windows.Controls;
-using POS_ModernUI.Helpers;
-using Microsoft.IdentityModel.Tokens;
+using Wpf.Ui.Abstractions;
+using Wpf.Ui.Appearance;
+using Wpf.Ui.Controls;
 
 namespace POS_ModernUI.Views.Windows
 {
     /// <summary>
     /// Interaction logic for AddEditProductWindow.xaml
     /// </summary>
-    public partial class AddNewPurchaseWindow : IPurchaseNavigationWindow
+    public partial class AddNewPurchaseWindow : IPurchasesNavigationWindow
     {
+        #region Props
         public AddNewPurchaseViewModel ViewModel { get; }
+        #endregion
+
+        #region Constructors
         public AddNewPurchaseWindow(AddNewPurchaseViewModel vm)
         {
             ViewModel = vm;
@@ -24,31 +28,25 @@ namespace POS_ModernUI.Views.Windows
 
             InitializeComponent();
         }
+        #endregion
 
+        #region Navigation Props
         public void ShowWindow() => Show();
         public void CloseWindow() => Close();
+        public INavigationView GetNavigation() => throw new NotImplementedException();
+        public bool Navigate(Type pageType) => throw new NotImplementedException();
+        public void SetPageService(INavigationViewPageProvider navigationViewPageProvider) => throw new NotImplementedException();
+        public void SetServiceProvider(IServiceProvider serviceProvider) => throw new NotImplementedException();
+        #endregion
 
-        public INavigationView GetNavigation()
-        {
-            throw new NotImplementedException();
-        }
-        public bool Navigate(Type pageType)
-        {
-            throw new NotImplementedException();
-        }
-        public void SetPageService(INavigationViewPageProvider navigationViewPageProvider)
-        {
-            throw new NotImplementedException();
-        }
-        public void SetServiceProvider(IServiceProvider serviceProvider)
-        {
-            throw new NotImplementedException();
-        }
+        #region WindowActions
         private void ComboBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
             var cb = sender as ComboBox;
 
-            if (int.TryParse(cb.SelectedValue.ToString(), out int value) && value == 0)
+            if (cb?.SelectedValue == null) return;
+
+            if (int.TryParse(cb?.SelectedValue.ToString(), out int value) && value == 0)
             {
                 txtSupplierName.Visibility = Visibility.Visible;
                 txtSupplierPhone.Visibility = Visibility.Visible;
@@ -59,26 +57,25 @@ namespace POS_ModernUI.Views.Windows
                 txtSupplierPhone.Visibility = Visibility.Collapsed;
             }
         }
-        private void TextBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        private async void TextBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             var txt = sender as Wpf.Ui.Controls.TextBox;
 
             if (e.Key == System.Windows.Input.Key.Enter)
             {
                 // add logic Barcode reader here
-                ViewModel.GetProductByBarCode(txt.Text);
+                await ViewModel.SearchProductByBarcodeAsync(txt?.Text!);
             }
         }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private async void Button_Click(object sender, RoutedEventArgs e)
         {
             if (ViewModel.NewPurchaseOrders.IsNullOrEmpty())
                 return;
 
-            ViewModel.OnSavePurchases();
+            ViewModel.SavePurchasesCommand.Execute(null);
 
             var msg = new Wpf.Ui.Controls.MessageBox();
-            if (msg.ShowMessage("هل تريد اضافة فاتورة جديدة", "تم حفظ الفاتورة بنجاح", System.Windows.MessageBoxButton.OKCancel)
+            if (await msg.ShowMessageAsync("هل تريد اضافة فاتورة جديدة", "تم حفظ الفاتورة بنجاح", System.Windows.MessageBoxButton.OKCancel)
                 != Wpf.Ui.Controls.MessageBoxResult.Primary) 
             {
                 this.Close();
@@ -87,5 +84,6 @@ namespace POS_ModernUI.Views.Windows
 
             ViewModel.RestartView();
         }
+        #endregion
     }
 }

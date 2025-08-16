@@ -6,8 +6,9 @@
     xmlns:local="clr-namespace:POS_ModernUI.Views.Windows"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-    Title="{Binding ViewModel.ApplicationTitle, Mode=OneWay}"
-    Width="500" Height="390" d:DesignHeight="390" d:DesignWidth="500"
+    Title="{Binding ViewModel.ApplicationTitle, Mode=OneWay}" 
+    d:DesignHeight="420" d:DesignWidth="600"
+    Height="420" Width="600"
     d:DataContext="{d:DesignInstance local:LoginWindow, IsDesignTimeCreatable=True}"
     ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"
     ui:Design.Foreground="{DynamicResource TextFillColorPrimaryBrush}"
@@ -45,7 +46,7 @@
         </ui:TitleBar>
 
         <StackPanel Grid.Row="1"
-                    Margin="70 40">
+                    Margin="70 20 70 0">
             <ui:TextBlock Text="تسجيل الدخول"
                           Appearance="Primary"
                           FontSize="30"
@@ -93,9 +94,22 @@
             <ui:Button Content="تسجيل الدخول"
                        Appearance="Primary"
                        HorizontalAlignment="Center"
-                       Margin="0 20"
+                       Margin="0 20 0 0"
                        Command="{Binding ViewModel.LoginProcessCommand}"
                        Click="LoginButton_Click"/>
+
+            <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Center"
+                        Margin="10">
+                <ui:ToggleSwitch Margin="10 0"
+                                 Command="{Binding ViewModel.ChangeThemeCommand}"
+                                 IsChecked="{Binding ViewModel.IsDarkTheme}"/>
+                <ui:TextBlock Text="Dark Mode"
+                              FontSize="15"
+                              FontWeight="Bold"
+                              Appearance="Primary"/>
+
+            </StackPanel>
         </StackPanel>
     </Grid>
 </ui:FluentWindow>

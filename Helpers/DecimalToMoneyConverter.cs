@@ -9,11 +9,13 @@ public class DecimalToMoneyConverter : IValueConverter
         if (value is decimal decimalValue)
         {
             // Convert the decimal value to a formatted string representing money
+            if (decimalValue % 1 == 0)
+                return decimalValue.ToString("C0", culture);
             return decimalValue.ToString("C", culture);
         }
         var stringValue = 0;
 
-        return stringValue.ToString("C", culture); // Return "0" if the value is not a decimal
+        return stringValue.ToString("C0", culture); // Return "0" if the value is not a decimal
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

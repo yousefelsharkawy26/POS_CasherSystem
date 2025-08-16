@@ -16,74 +16,83 @@
     ui:Design.Foreground="{DynamicResource TextFillColorPrimaryBrush}"
     Foreground="{DynamicResource TextFillColorPrimaryBrush}"
     mc:Ignorable="d"
-    FlowDirection="RightToLeft">
+    Loaded="Page_Loaded">
     <Page.Resources>
         <helpers:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />
     </Page.Resources>
 
-    <StackPanel>
+    <Grid Margin="40">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
             
-            <TextBlock FontSize="20"
-                       FontWeight="Medium"
-                       Text="السمات" />
-
             <StackPanel Orientation="Horizontal"
                         Margin="30">
                 <ui:ToggleSwitch Margin="10 0"
                      Command="{Binding ViewModel.ChangeThemeCommand}"
                      IsChecked="{Binding ViewModel.IsDarkTheme}"/>
-                <ui:TextBlock Text="Dark"
+                <ui:TextBlock Text="Dark Mode"
                   FontSize="15"
                   FontWeight="Bold"
                   Appearance="Primary"/>
 
             </StackPanel>
 
-            <!--<ui:Image Source="{Binding ViewModel.IpQRImage}"
-                      Width="150"
-                      Height="150"
-                      Grid.Column="1"/>-->
-
         </Grid>
 
-        <TextBlock FontSize="20"
-                   FontWeight="Medium"
-                   Text="إعدادت المستخدم" 
-                   Margin="0 10 0 30"/>
-
-        <Grid Margin="200 10">
+        <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="100"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="1.5*"/>
+                <ColumnDefinition/>
             </Grid.ColumnDefinitions>
-            <TextBlock Text="اسم المستخدم"/>
-            <ui:TextBox Grid.Column="1"
-                        Text="{Binding ViewModel.UserName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <TextBlock Text="{Binding ViewModel.CountDown}"
+                       Grid.Column="1"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       FontSize="20"
+                       FontWeight="Heavy"/>
+            <StackPanel FlowDirection="RightToLeft">
+                <ComboBox ItemsSource="{Binding ViewModel.ScheduleChoices}"
+                          SelectedItem="{Binding ViewModel.SelectedScheduleDomain}"
+                          Margin="20"/>
+
+                <StackPanel Orientation="Horizontal"
+                            Margin="20"
+                            VerticalAlignment="Center">
+                    <ui:Button Content="📦 تأكيد ميعاد النسخ"
+                               FontWeight="Bold"
+                               Appearance="Primary"
+                               Command="{Binding ViewModel.SubmitChangeScheduleDomainCommand}"/>
+
+                    <ui:Button Content="📦 إنشاء نسخة احتياطية الآن" 
+                               FontWeight="Bold"
+                               Appearance="Primary"
+                               Command="{Binding ViewModel.ManualBackupCommand}"/>
+
+                    <ui:Button Content="إسترجاع النسخه الاحتياطية"
+                               FontWeight="Bold"
+                               Appearance="Secondary"
+                               Command="{Binding ViewModel.RestoreBackupCommand}"/>
+                </StackPanel>
+            </StackPanel>
         </Grid>
-        <Grid Margin="200 10">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="100"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <TextBlock Text="كلمة السر"/>
-            <ui:PasswordBox Grid.Column="1"
-                Password="{Binding ViewModel.Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-        </Grid>
-        <ui:Button Content="تغيير"
-                   HorizontalAlignment="Center"
-                   Width="200"
-                   Appearance="Light"
-                   Command="{Binding ViewModel.ChangeUserNameAndPasswordCommand}"/>
-        <TextBlock
-            Margin="0,24,0,0"
-            FontSize="20"
-            FontWeight="Medium"
-            Text="About POS_ModernUI" />
-        <TextBlock Margin="0,12,0,0" Text="{Binding ViewModel.AppVersion, Mode=OneWay}" />
-    </StackPanel>
+        
+        <StackPanel Grid.Row="2"
+                    VerticalAlignment="Bottom">
+            <TextBlock
+                FontSize="20"
+                FontWeight="Medium"
+                Text="About POS_ModernUI"/>
+
+            <TextBlock Text="{Binding ViewModel.AppVersion, Mode=OneWay}"
+                       Margin="0 50 0 0"/>
+        </StackPanel>
+    </Grid>
 </Page>

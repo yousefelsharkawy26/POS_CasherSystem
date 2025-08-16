@@ -1,79 +1,97 @@
-﻿using POS_ModernUI.Models;
+﻿using POS_ModernUI.DataAccess.UnitOfWork;
+using POS_ModernUI.Models;
+using POS_ModernUI.Services.Contracts;
 using POS_ModernUI.Views.Windows;
 using System.Collections.ObjectModel;
-using POS_ModernUI.Services.Contracts;
-using POS_ModernUI.Database.Repository.IRepository;
+using System.Threading.Tasks;
+using Wpf.Ui;
 
 namespace POS_ModernUI.ViewModels.Pages;
 public partial class PurchaseManagementViewModel: ObservableObject
 {
+    #region Fields
     private readonly IUnitOfWork _unitOfWork;
     private readonly IServiceProvider _serviceProvider;
-    private IPurchaseNavigationWindow _navigationWindow;
+    private IPurchasesNavigationWindow? _navigationWindow;
+    #endregion
 
-    [ObservableProperty]
-    private ObservableCollection<Supplier> _suppliers;
-    [ObservableProperty]
-    private ObservableCollection<PurchaseOrder> _purchaseOrders = new();
-    [ObservableProperty]
-    private ObservableCollection<PurchaseOrderDetail> _purchaseOrdersItems = new();
-    [ObservableProperty]
-    private string _searchSupplier = string.Empty;
+    #region Props
+    [ObservableProperty] private ObservableCollection<Supplier> _suppliers = new();
+    [ObservableProperty] private ObservableCollection<PurchaseOrder> _purchaseOrders = new();
+    [ObservableProperty] private ObservableCollection<PurchaseOrderDetail> _purchaseOrdersItems = new();
+    [ObservableProperty] private string _searchSupplier = string.Empty;
+    #endregion
 
+    #region Constructors
     public PurchaseManagementViewModel(IUnitOfWork unitOfWork,
                                       IServiceProvider serviceProvider)
     {
         _unitOfWork = unitOfWork;
         _serviceProvider = serviceProvider;
-        Suppliers = new(_unitOfWork.Suppliers.GetAll());
+        _ = InitializeAsync();
     }
+    #endregion
 
+    #region Initializations
+    private async Task InitializeAsync()
+    {
+        Suppliers = new(await _unitOfWork.Suppliers.GetAllAsync());
+    }
+    #endregion
+
+    #region Class Changing
     partial void OnSearchSupplierChanging(string value)
     {
-        if (!string.IsNullOrWhiteSpace(value)) 
-            Suppliers = new(_unitOfWork.Suppliers.GetAll(u => u.Name.Contains(value)));
-        else
-            Suppliers = new(_unitOfWork.Suppliers.GetAll());
+        _ = SearchSupplierHelper(value);
     }
+    private async Task SearchSupplierHelper(string value)
+    {
+        if (!string.IsNullOrWhiteSpace(value))
+            Suppliers = new(await _unitOfWork.Suppliers.GetAllAsync(u => u.Name.Contains(value)));
+        else
+            Suppliers = new(await _unitOfWork.Suppliers.GetAllAsync());
+    }
+    #endregion
 
+    #region Commands
     [RelayCommand]
-    private void OnSelectSupplier(Supplier supplier)
+    private async Task OnSelectSupplier(Supplier supplier)
     {
         if (supplier == null)
             return;
 
-        PurchaseOrders = new(_unitOfWork.PurchaseOrders.GetAll(u => u.SupplierId == supplier.SupplierId));
+        PurchaseOrders = new(await _unitOfWork.PurchaseOrders.GetAllAsync(u => u.SupplierId == supplier.SupplierId));
     }
 
     [RelayCommand]
-    private void OnDeleteSupplier(Supplier supplier)
+    private async Task OnDeleteSupplier(Supplier supplier)
     {
         if (supplier == null)
             return;
 
         PurchaseOrders.Clear();
         Suppliers.Remove(supplier);
-        _unitOfWork.Suppliers.Delete(supplier);
-        _unitOfWork.Save();
+        await _unitOfWork.Suppliers.DeleteAsync(supplier);
+        await _unitOfWork.SaveAsync();
     }
 
     [RelayCommand]
-    private void OnSelectPurchaseOrder(PurchaseOrder purchaseOrder)
+    private async Task OnSelectPurchaseOrder(PurchaseOrder purchaseOrder)
     {
         if (purchaseOrder == null)
             return;
 
         PurchaseOrdersItems = new(
-            _unitOfWork.PurchaseOrderDetails
-            .GetAll(u => u.PurchaseOrderId == purchaseOrder.PurchaseOrderId, includeProp:"Product")
+            await _unitOfWork.PurchaseOrderDetails
+            .GetAllAsync(u => u.PurchaseOrderId == purchaseOrder.PurchaseOrderId, includeProp:"Product")
         );
     }
 
     [RelayCommand]
-    private void OnDeletePurchaseOrder(PurchaseOrder purchaseOrder)
+    private async Task OnDeletePurchaseOrder(PurchaseOrder purchaseOrder)
     {
-        _unitOfWork.PurchaseOrders.Delete(purchaseOrder);
-        _unitOfWork.Save();
+        await _unitOfWork.PurchaseOrders.DeleteAsync(purchaseOrder);
+        await _unitOfWork.SaveAsync();
 
         PurchaseOrders.Remove(purchaseOrder);
     }
@@ -82,7 +100,7 @@ public partial class PurchaseManagementViewModel: ObservableObject
     private async Task OnAddPurchaseOperation()
     {
         _navigationWindow = (
-                    _serviceProvider.GetService(typeof(IPurchaseNavigationWindow)) as IPurchaseNavigationWindow
+                    _serviceProvider.GetService(typeof(IPurchasesNavigationWindow)) as IPurchasesNavigationWindow
                 )!;
         _navigationWindow!.ShowWindow();
 
@@ -90,20 +108,21 @@ public partial class PurchaseManagementViewModel: ObservableObject
         await Task.CompletedTask;
     }
 
-    private void ProductManagementViewModel_Closed(object? sender, EventArgs e)
+    private async void ProductManagementViewModel_Closed(object? sender, EventArgs e)
     {
         PurchaseOrders.Clear();
-        Suppliers = new(_unitOfWork.Suppliers.GetAll());
+        Suppliers = new(await _unitOfWork.Suppliers.GetAllAsync());
     }
 
     [RelayCommand]
-    private void OnDeletePurchaseOrderItem(PurchaseOrderDetail orderItem) 
+    private async Task OnDeletePurchaseOrderItem(PurchaseOrderDetail orderItem) 
     {
         if (orderItem == null) return;
 
         PurchaseOrdersItems.Remove(orderItem);
 
-        _unitOfWork.PurchaseOrderDetails.Delete(orderItem);
-        _unitOfWork.Save();
+        await _unitOfWork.PurchaseOrderDetails.DeleteAsync(orderItem);
+        await _unitOfWork.SaveAsync();
     }
+    #endregion
 }

@@ -1,0 +1,300 @@
+﻿<ui:ContentDialog x:Class="POS_ModernUI.Views.Dialogs.CustomersDetailsDialog"
+                  xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+                  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+                  xmlns:local="clr-namespace:POS_ModernUI.Views.Dialogs" 
+                  xmlns:conv="clr-namespace:POS_ModernUI.Helpers"
+                  mc:Ignorable="d" 
+                  ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"
+                  ui:Design.Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                  d:DesignHeight="800" d:DesignWidth="1400"
+                  FlowDirection="RightToLeft"
+                  CloseButtonAppearance="Transparent"
+                  CloseButtonText="">
+    
+    <ui:ContentDialog.Resources>
+        <conv:CusBooleanToVisibility x:Key="CusBooleanToVisibility"/>
+        <conv:DatetoTimeAgeConverter x:Key="DatetoTimeAgeConverter"/>
+        <Style BasedOn="{StaticResource {x:Type ui:ContentDialog}}" 
+           TargetType="{x:Type local:CustomersDetailsDialog}" />
+        
+        
+    </ui:ContentDialog.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="400"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <WrapPanel Grid.Column="0"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center">
+            <Border Width="300"
+                    Height="200"
+                    Margin="30"
+                    CornerRadius="10">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" 
+                                         EndPoint="1,1"
+                                         Opacity="0.5">
+                        <GradientStop Color="#FFB0BEC5" Offset="0"/>
+                        <GradientStop Color="#FF90A4AE" Offset="1"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+                <Grid>
+                    <Border Background="{DynamicResource ApplicationBackgroundBrush}" 
+                            CornerRadius="10" 
+                            Padding="10">
+                        <StackPanel>
+                            <ui:TextBlock Text="{Binding CustomerDetails.CustomerName}"
+                                            FontFamily="Cairo"
+                                            Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                            FontSize="20" 
+                                            FontWeight="Bold" 
+                                            Margin="0,0,0,10"/>
+                            <ui:TextBlock Text="{Binding CustomerDetails.CustomerPhone}" 
+                                         Margin="0,0,0,5"
+                                          FontFamily="Cairo"
+                                          FontSize="18"
+                                          Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                            <ui:TextBlock Text="{Binding CustomerDetails.CustomerAddress}" 
+                                          Margin="0,0,0,5"
+                                          FontFamily="Cairo"
+                                          FontSize="18"
+                                          Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+
+                            <ui:TextBlock Text="{Binding CustomerDetails.CustomerNotes}" 
+                                          TextWrapping="Wrap"
+                                          FontFamily="Cairo"
+                                          FontSize="18"
+                                          Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Border>
+            <Border Width="300"
+                    Visibility="{Binding IsNotEmpty, Converter={StaticResource CusBooleanToVisibility}}"
+                    Height="200"
+                    Margin="30"
+                    CornerRadius="10">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" 
+                                         EndPoint="1,1"
+                                         Opacity="0.5">
+                        <GradientStop Color="#FFB0BEC5" Offset="0"/>
+                        <GradientStop Color="#FF90A4AE" Offset="1"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+                <Grid>
+                    <Border Background="{DynamicResource ApplicationBackgroundBrush}" 
+                            CornerRadius="10" 
+                            Padding="10">
+                        <StackPanel>
+                            <Grid>
+                                <ui:TextBlock Text="الإجمالى"
+                                              FontFamily="Cairo"
+                                              Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                              FontSize="20" 
+                                              FontWeight="Bold" 
+                                              HorizontalAlignment="Left"
+                                              Margin="0,0,0,10"/>
+
+                                <ui:TextBlock Text="{Binding CustomerDetails.TotalDebt}"
+                                                FontFamily="Cairo"
+                                                Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                                FontSize="20" 
+                                                HorizontalAlignment="Right"
+                                                FontWeight="Bold" 
+                                                Margin="0,0,0,10"/>
+                            </Grid>
+                            <Grid>
+                                <ui:TextBlock Text="المدفوع" 
+                                              Margin="0,0,0,5"
+                                              HorizontalAlignment="Left"
+                                              FontFamily="Cairo"
+                                              FontSize="18"
+                                              Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                
+                                <ui:TextBlock Text="{Binding CustomerDetails.TotalPaid}" 
+                                              Margin="0,0,0,5"
+                                              HorizontalAlignment="Right"
+                                              FontFamily="Cairo"
+                                              FontSize="18"
+                                              Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                            </Grid>
+                            <Grid>
+                                <ui:TextBlock Text="المتبقى" 
+                                              Margin="0,0,0,5"
+                                              HorizontalAlignment="Left"
+                                              FontFamily="Cairo"
+                                              FontSize="18"
+                                              Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+
+                                <ui:TextBlock Text="{Binding CustomerDetails.RemainingDebt}" 
+                                              Margin="0,0,0,5"
+                                              HorizontalAlignment="Right"
+                                              FontFamily="Cairo"
+                                              FontSize="18"
+                                              Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                            </Grid>
+
+                            <Grid>
+                                <ui:TextBlock Text="تاريخ اخر دفعة" 
+                                              TextWrapping="Wrap"
+                                              HorizontalAlignment="Left"
+                                              FontFamily="Cairo"
+                                              FontSize="18"
+                                              Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+
+                                <ui:TextBlock Text="{Binding CustomerDetails.LastPaymentDate, Converter={StaticResource DatetoTimeAgeConverter}}" 
+                                              TextWrapping="Wrap"
+                                              HorizontalAlignment="Right"
+                                              FontFamily="Cairo"
+                                              FontSize="18"
+                                              Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Border>
+        </WrapPanel>
+
+        <Grid Grid.Column="1"
+              Margin="20"
+              MaxHeight="600">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <ui:TextBlock Text="تفاصيل المديونيات"
+                          Appearance="Primary"
+                          FontFamily="Cairo"
+                          FontSize="27"
+                          FontWeight="Bold"
+                          Margin="20"/>
+
+            <ui:TextBlock Text="{Binding EmptyMessage}"
+                          Grid.Row="1"
+                          Appearance="Primary"
+                          FontSize="30"
+                          FontFamily="Cairo"
+                          VerticalAlignment="Center"
+                          HorizontalAlignment="Center"
+                          Visibility="{Binding IsEmpty, Converter={StaticResource CusBooleanToVisibility}}"/>
+
+            <ScrollViewer VerticalScrollBarVisibility="Auto"
+                          MaxHeight="650"
+                          Grid.Row="1">
+                <ItemsControl ItemsSource="{Binding CustomerDetails.DebtSales}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Expander Margin="5 2"
+                                      Background="#FFE0E0E0"
+                                      BorderBrush="#FFB0BEC5"
+                                      BorderThickness="1"
+                                      Padding="0">
+                                <Expander.Header>
+                                    <Grid Margin="10">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <ui:TextBlock Text="الدين:" 
+                                                      FontWeight="Bold" 
+                                                      Grid.Column="0"
+                                                      Foreground="#222"/>
+                                        <ui:TextBlock Text="{Binding TotalAmount}"
+                                                      Grid.Column="1"
+                                                      Margin="0,0,10,0"
+                                                      Foreground="#333"/>
+                                        <ui:TextBlock Text="المدفوع:"
+                                                      FontWeight="Bold"
+                                                      Grid.Column="2"
+                                                      Margin="0,0,10,0"
+                                                      Foreground="#222"/>
+                                        <ui:TextBlock Text="{Binding PaidAmount}"
+                                                      Grid.Column="3"
+                                                      Margin="0,0,10,0"
+                                                      Foreground="#333"/>
+                                        <ui:TextBlock Text="المتبقى:"
+                                                      FontWeight="Bold"
+                                                      Grid.Column="4"
+                                                      Margin="0,0,10,0"
+                                                      Foreground="#222"/>
+                                        <ui:TextBlock Text="{Binding RemainingAmount}"
+                                                      Grid.Column="5"
+                                                      Margin="0,0,10,0"
+                                                      Foreground="#222"/>
+                                    </Grid>
+                                </Expander.Header>
+                                <StackPanel >
+                                    <ItemsControl ItemsSource="{Binding Payments}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Background="#FFF5F5F5" CornerRadius="3" Padding="8" Margin="0,5,0,0">
+                                                    <StackPanel>
+                                                        <StackPanel Orientation="Horizontal">
+                                                        <ui:TextBlock Text="دفعة:"
+                                                                      FontWeight="Bold"
+                                                                      Margin="0,0,10,0"
+                                                                      Foreground="#222"/>
+                                                        <ui:TextBlock Text="{Binding PaymentAmount}"
+                                                                      Margin="0,0,10,0"
+                                                                      Foreground="#333"/>
+                                                        <ui:TextBlock Text="تاريخ:"
+                                                                      FontWeight="Bold"
+                                                                      Margin="0,0,10,0"
+                                                                      Foreground="#222"/>
+                                                        <ui:TextBlock Text="{Binding PaymentDate}"
+                                                                      Margin="0,0,10,0"
+                                                                      Foreground="#333"/>
+                                                    </StackPanel>
+                                                        <ui:TextBlock Text="{Binding Notes}" 
+                                                                      Foreground="#333"/>
+                                                    </StackPanel>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </Expander>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+
+            <StackPanel Grid.Row="2"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Center">
+                <ui:Button Content="حذف السجل"
+                           Click="RemoveDebts_Click"
+                           Appearance="Dark"
+                           Width="150"
+                           Cursor="Hand"
+                           Margin="5 0"/>
+                <ui:Button Content="حذف العميل"
+                           Click="RemoveCustomer_Click"
+                           Appearance="Danger"
+                           Cursor="Hand"
+                           Width="150"
+                           Margin="5 0"/>
+
+                <ui:Button Content="إغلاق"
+                           Click="Close_Click"
+                           Appearance="Secondary"
+                           Cursor="Hand"
+                           Width="150"
+                           Margin="5 0"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</ui:ContentDialog>

@@ -4,7 +4,7 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:local="clr-namespace:POS_ModernUI.Views.Pages"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-      xmlns:models="clr-namespace:POS_ModernUI.Models"
+      xmlns:models="clr-namespace:POS_ModernUI.Models;assembly=POS_ModernUI.Models"
       xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml" xmlns:conv="clr-namespace:POS_ModernUI.Helpers"
       Title="Purshase Management"
@@ -21,6 +21,7 @@
 
     <Page.Resources>
         <conv:DatetoTimeAgeConverter x:Key="DatetoTimeAgeConverter" />
+        <conv:DecimalToMoneyConverter x:Key="DecimalToMoneyConverter" />
     </Page.Resources>
 
     <Grid>
@@ -54,7 +55,6 @@
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="60"/>
-                    <RowDefinition Height="60"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
@@ -70,7 +70,7 @@
                                FontWeight="ExtraBold"
                                Command="{Binding ViewModel.SelectTodaySalesCommand}"/>
 
-                    <ui:TextBlock Text="{Binding ViewModel.TotalSalesCost}" 
+                    <ui:TextBlock Text="{Binding ViewModel.TotalSalesCost, Mode=TwoWay, Converter={StaticResource DecimalToMoneyConverter}}" 
                                   FontSize="20"
                                   FontWeight="ExtraBold"
                                   Foreground="Green"
@@ -78,25 +78,6 @@
                                   VerticalAlignment="Center"
                                   Margin="120 0 0 0"/>
                 </StackPanel>
-                <Grid Grid.Row="1">
-                    <StackPanel Height="35"
-                                VerticalAlignment="Bottom"
-                                HorizontalAlignment="Left"
-                                Orientation="Horizontal"
-                                Margin="40,0,0,2">
-
-                        <ui:SymbolIcon Symbol="Search12"
-                                       Foreground="Wheat"
-                                       HorizontalAlignment="Left"
-                                       Margin="0,0,10,0"/>
-                        <ui:TextBox PlaceholderText="ابحث عن المورد....."
-                                    Height="35"
-                                    Width="200"
-                                    Text="{Binding ViewModel.SearchSalesOrder, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-
-                    </StackPanel>
-                    
-                </Grid>
                 <DataGrid x:Name="Workersdata"
                           ItemsSource="{Binding ViewModel.SalesOrders}"
                           VerticalScrollBarVisibility="Auto"
@@ -135,14 +116,6 @@
                             Width="*">
                         </DataGridTextColumn>
                         
-                        <DataGridTextColumn Header="الباركود"
-                            Binding="{Binding SalesOrderBarcode}"
-                            ElementStyle="{StaticResource CenterDtaGridCell}"
-                            HeaderStyle="{DynamicResource CenterGridHeaderStyle}"
-                            IsReadOnly="True"
-                            Width="*">
-                        </DataGridTextColumn>
-
                         <DataGridTemplateColumn Header="عملیات"
                                 Width="85"
                                 HeaderStyle="{DynamicResource CenterGridHeaderStyle}">
@@ -180,8 +153,8 @@
             </Grid>
         </Grid>
         <ui:ContentDialog Title="الطلبات"
-                            x:Name="dlgOrderDetails"
-                            Visibility="Collapsed">
+                          x:Name="dlgOrderDetails"
+                          Visibility="Collapsed">
             <ui:ContentDialog.Content>
                 <ui:DataGrid ItemsSource="{Binding Path=DataContext.ViewModel.SalesOrderItems, UpdateSourceTrigger=PropertyChanged, RelativeSource= {RelativeSource FindAncestor,AncestorType={x:Type ui:ContentDialog}}}"
                                 VerticalScrollBarVisibility="Auto"

@@ -9,10 +9,16 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ui:ThemesDictionary Theme="Light" />
+                <ui:ThemesDictionary Theme="Unknown" />
                 <ui:ControlsDictionary />
                 <ResourceDictionary Source="Styles/DataGridStyle.xaml" />
             </ResourceDictionary.MergedDictionaries>
+
+        <Style TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Cairo" />
+        </Style>
+            
+        
         </ResourceDictionary>
     </Application.Resources>
 </Application>

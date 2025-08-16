@@ -14,5 +14,10 @@ namespace POS_ModernUI.Views.Pages
 
             InitializeComponent();
         }
+
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            ViewModel.StartCountdownCommand.Execute(this);
+        }
     }
 }

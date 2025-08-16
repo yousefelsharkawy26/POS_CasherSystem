@@ -8,7 +8,7 @@ using SixLabors.ImageSharp.Processing;
 namespace POS_ModernUI.Services.ImageServices;
 public class ImageCompressor
 {
-    public async Task<string> SaveCompressedAsync(string sourcePath, string destination,string name, int maxWidth = 256)
+    public async Task<string?> SaveCompressedAsync(string sourcePath, string destination,string name, int maxWidth = 256)
     {
         if (!File.Exists(sourcePath))
             throw new FileNotFoundException("Source image not found", sourcePath);
